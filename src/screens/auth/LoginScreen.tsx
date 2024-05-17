@@ -1,9 +1,8 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import axios from 'axios';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../router/types';
 
@@ -12,19 +11,21 @@ type FormData = {
   password: string;
 };
 
-// Type guard for Error object
-function isError(obj: unknown): obj is Error {
-  return obj instanceof Error;
-}
-
 const LoginScreen = () => {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const { control, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      reset();
+    }
+  }, [isFocused]);
 
   const onSubmit = async (data: FormData) => {
     try {
       const response = await axios.post('http://163.172.177.98:8081/auth/login', data);
-      console.log('API Response:', response.data);  // Log the response data
+      console.log('API Response:', response.data);
       const token = response.data.accessToken;
 
       if (!token) {
@@ -35,11 +36,7 @@ const LoginScreen = () => {
       navigation.navigate('UserDetails', { token });
     } catch (error) {
       console.error(error);
-      if (isError(error)) {
-        Alert.alert('Error', error.message || 'Failed to login');
-      } else {
-        Alert.alert('Error', 'Failed to login');
-      }
+      Alert.alert('Error', 'Failed to login');
     }
   };
 

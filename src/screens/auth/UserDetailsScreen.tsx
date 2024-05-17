@@ -1,8 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useRoute, useNavigation, NavigationProp } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../router/types';
 
 type UserDetails = {
@@ -16,6 +16,7 @@ const UserDetailsScreen = () => {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const route = useRoute<RouteProp<RootStackParamList, 'UserDetails'>>();
   const { token } = route.params;
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -25,7 +26,7 @@ const UserDetailsScreen = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('User Details Response:', response.data); // Log the response data
+        console.log('User Details Response:', response.data);
         setUserDetails(response.data);
       } catch (error) {
         console.error(error);
@@ -35,6 +36,16 @@ const UserDetailsScreen = () => {
 
     fetchUserDetails();
   }, [token]);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to logout');
+    }
+  };
 
   if (!userDetails) {
     return (
@@ -50,6 +61,7 @@ const UserDetailsScreen = () => {
       {userDetails.user.id ? <Text>User ID: {userDetails.user.id}</Text> : null}
       <Text>Email: {userDetails.user.email}</Text>
       <Text>Password: Sorry, that's private</Text>
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };
