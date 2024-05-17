@@ -1,4 +1,4 @@
-// LoginScreen.tsx
+
 import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
