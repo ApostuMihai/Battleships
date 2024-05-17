@@ -1,3 +1,4 @@
+// UserDetailsScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
@@ -10,6 +11,9 @@ type UserDetails = {
     id: string;
     email: string;
   };
+  gamesPlayed: number;
+  gamesWon: number;
+  gamesLost: number;
 };
 
 const UserDetailsScreen = () => {
@@ -60,6 +64,9 @@ const UserDetailsScreen = () => {
       <Text style={styles.heading}>{userDetails.user.email}'s details page</Text>
       {userDetails.user.id ? <Text>User ID: {userDetails.user.id}</Text> : null}
       <Text>Email: {userDetails.user.email}</Text>
+      <Text>Games played: {userDetails.gamesPlayed}</Text>
+      <Text>Games won: {userDetails.gamesWon}</Text>
+      <Text>Games lost: {userDetails.gamesLost}</Text>
       <Text>Password: Sorry, that's private</Text>
       <Button title="Logout" onPress={handleLogout} />
     </View>
